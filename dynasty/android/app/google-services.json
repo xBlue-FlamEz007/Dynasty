@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "614568915013",
+    "project_id": "dynasty-flutter",
+    "storage_bucket": "dynasty-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614568915013:android:f7ba5ebf6e90cc6a0b332c",
+        "android_client_info": {
+          "package_name": "com.hellfirehelix.dynasty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "614568915013-ivj0afglhpsrjcgpgabhqrjiobt6s44v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hellfirehelix.dynasty",
+            "certificate_hash": "b4b16777c0e5706301eb60440d6eb21e4ea3b783"
+          }
+        },
+        {
+          "client_id": "614568915013-r5vim1h0r0ml37sutb22saj9omi9esi5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBml56plRt7BFkUJWZb19tVXz8XZOddyJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "614568915013-r5vim1h0r0ml37sutb22saj9omi9esi5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
