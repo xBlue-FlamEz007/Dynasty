@@ -1,6 +1,7 @@
 import 'package:dynasty/common_widgets/form_submit_button.dart';
 import 'package:dynasty/common_widgets/loading.dart';
 import 'package:dynasty/common_widgets/platform_alert_dialog.dart';
+import 'package:dynasty/modals/databse.dart';
 import 'package:dynasty/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       if (_formType == EmailSignInFormType.signIn) {
         await auth.signInWithEmailAndPassword(_email, _password);
       } else {
-        await auth.createUserWithEmailAndPassword(_email, _password);
+        await auth.createUserWithEmailAndPassword(_firstName, _lastName, _email, _password);
       }
       Navigator.of(context).pop();
     }  catch (e) {

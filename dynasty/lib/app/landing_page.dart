@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dynasty/app/home_page.dart';
+import 'package:dynasty/modals/user.dart';
 import 'package:dynasty/services/auth.dart';
 import 'package:dynasty/app/sign_in/sign_in_page.dart';
 import 'package:flutter/material.dart';
