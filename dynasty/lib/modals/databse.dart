@@ -4,14 +4,16 @@ class DatabaseService {
   DatabaseService({this.uid});
   final String uid;
 
-  final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future updateUserData(String firstName, String lastName, String email) async {
-    return await userCollection.doc(uid).set({
-      'first name': firstName,
-      'last name': lastName,
-      'Email': email,
+    var documentReference = firestore.collection("users").doc(uid);
+    firestore.runTransaction((transaction) async {
+      transaction.set(documentReference, {
+        'first name': firstName,
+        'last name': lastName,
+        'Email': email,
+      });
     });
   }
-
 }
