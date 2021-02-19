@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dynasty/common_widgets/custom_text_form_field.dart';
 import 'package:dynasty/common_widgets/form_submit_button.dart';
 import 'package:dynasty/common_widgets/loading.dart';
 import 'package:dynasty/common_widgets/platform_alert_dialog.dart';
@@ -224,12 +225,10 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     });
   }
 
-  TextFormField _buildPasswordTextField() {
-    return TextFormField(
+  Widget _buildPasswordTextField() {
+    return CustomTextFormField(
       controller: _passwordController,
-      decoration: InputDecoration(
-          labelText: 'Password'
-      ),
+      labelText: 'Password',
       obscureText: true,
       validator: _passwordValidator,
     );
@@ -237,11 +236,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   Widget _buildConfirmPasswordTextField() {
     if (_formType == EmailSignInFormType.register) {
-      return TextFormField(
+      return CustomTextFormField(
         controller: _confirmPasswordController,
-        decoration: InputDecoration(
-          labelText: 'Confirm Password'
-        ),
+        labelText: 'Confirm Password',
         obscureText: true,
         validator: _confirmPasswordValidator,
       );
@@ -250,23 +247,19 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     }
   }
 
-  TextFormField _buildEmailTextField() {
-    return TextFormField(
+  Widget _buildEmailTextField() {
+    return CustomTextFormField(
       controller: _emailController,
-      decoration: InputDecoration(
-        labelText: 'Email',
-      ),
+      labelText: 'Email',
       validator: _emailValidator,
     );
   }
 
   Widget _buildFirstNameTextField() {
     if (_formType == EmailSignInFormType.register) {
-      return TextFormField(
+      return CustomTextFormField(
         controller: _firstNameController,
-        decoration: InputDecoration(
-          labelText: 'First Name',
-        ),
+        labelText: 'First Name',
         validator: _nameValidator,
       );
     } else {
@@ -276,11 +269,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   Widget _buildLastNameTextField() {
     if (_formType == EmailSignInFormType.register) {
-      return TextFormField(
+      return CustomTextFormField(
         controller: _lastNameController,
-        decoration: InputDecoration(
-          labelText: 'Last Name',
-        ),
+        labelText: 'Last Name',
         validator: _nameValidator,
       );
     } else {

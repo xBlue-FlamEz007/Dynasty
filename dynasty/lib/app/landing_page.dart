@@ -1,5 +1,4 @@
-import 'dart:async';
-import 'package:dynasty/app/home_page.dart';
+import 'package:dynasty/app/navigation_bar.dart';
 import 'package:dynasty/modals/user.dart';
 import 'package:dynasty/services/auth.dart';
 import 'package:dynasty/app/sign_in/sign_in_page.dart';
@@ -19,7 +18,7 @@ class LandingPage extends StatelessWidget {
           if (user == null) {
             return SignInPage();
           }
-          return HomePage();
+          return NavigationBar();
         } else {
           return Scaffold(
             body: Center(
