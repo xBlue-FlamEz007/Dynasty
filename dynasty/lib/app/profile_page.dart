@@ -1,8 +1,13 @@
-import 'package:dynasty/app/sign_in/email_sign_in_form.dart';
+import 'dart:io';
 import 'package:dynasty/common_widgets/custom_text_form_field.dart';
 import 'package:dynasty/common_widgets/form_submit_button.dart';
+import 'package:dynasty/common_widgets/loading.dart';
 import 'package:dynasty/common_widgets/platform_alert_dialog.dart';
+import 'package:dynasty/common_widgets/select_pics.dart';
+import 'package:dynasty/modals/user.dart';
 import 'package:dynasty/services/auth.dart';
+import 'package:dynasty/services/database.dart';
+import 'package:dynasty/services/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +21,33 @@ class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  String get _firstName => _firstNameController.text;
+  String get _lastName => _lastNameController.text;
+  File _imageFile;
+  SelectPics _imageHandler = SelectPics();
+  Validator _validator = Validator();
+
+  void _submit() async {
+    final isValid = _formKey.currentState.validate();
+    if (!isValid) {
+      return;
+    }
+    _formKey.currentState.save();
+
+    try {
+      final auth = Provider.of<AuthBase>(context, listen: false);
+      String uid = auth.currentUserID();
+      _imageFile = _imageHandler.imageFile;
+      await DatabaseService(uid: uid).updateUserData(_firstName, _lastName, _imageFile);
+      Navigator.of(context).pop();
+    }  catch (e) {
+      PlatformAlertDialog(
+        title: 'Profile Update Failed',
+        content: e.message,
+        defaultActionText: 'OK',
+      ).show(context);
+    }
+  }
 
   Future<void> _signOut(BuildContext context) async {
     try {
@@ -38,20 +70,11 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  String _nameValidator(value) {
-    if (value.isEmpty ||
-        !RegExp(r"^^[a-zA-Z]+").hasMatch(value)) {
-      return 'Enter a valid name';
-    }
-    return null;
-  }
-
   CustomTextFormField _buildFirstNameTextField() {
     return CustomTextFormField(
       controller: _firstNameController,
       labelText: 'First Name',
-      obscureText: true,
-      validator: _nameValidator,
+      validator: _validator.nameValidator,
     );
   }
 
@@ -59,14 +82,13 @@ class _ProfilePageState extends State<ProfilePage> {
     return CustomTextFormField(
       controller: _lastNameController,
       labelText: 'Last Name',
-      obscureText: true,
-      validator: _nameValidator,
+      validator: _validator.nameValidator,
     );
   }
 
   List<Widget> _buildChildren() {
     return [
-     // _profilePicField(),
+      _imageHandler,
       SizedBox(height: 8.0,),
       _buildFirstNameTextField(),
       SizedBox(height: 8.0,),
@@ -74,47 +96,73 @@ class _ProfilePageState extends State<ProfilePage> {
       SizedBox(height: 16.0,),
       FormSubmitButton(
         text: 'Update',
-        onPressed: () {},
+        onPressed: _submit,
       ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-        actions: <Widget>[
-          FlatButton(
-            child: Text(
-              'Logout',
-              style: TextStyle(
-                fontSize: 18.0,
-                color: Colors.white,
-              ),
+
+    final auth = Provider.of<AuthBase>(context, listen: false);
+    String uid = auth.currentUserID();
+
+    return StreamBuilder(
+      stream: DatabaseService(uid: uid).userData,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          UserData userData = snapshot.data;
+          _firstNameController.text = userData.firstName;
+          _lastNameController.text = userData.lastName;
+          String _imageName = userData.profilePic;
+          print(_imageName);
+          //var _imageUrl = DatabaseService(uid: uid).getImageURL(_imageName);
+          //print(_imageUrl);
+          //String _url = _imageUrl.toString();
+          //print(_url);
+          _imageHandler.url = _imageName;
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Profile'),
+              centerTitle: true,
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: () => _confirmSignOut(context),
+                )
+              ],
             ),
-            onPressed: () => _confirmSignOut(context),
-          )
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: _buildChildren(),
+            body: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: _buildChildren(),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+        else {
+          return Loading();
+        }
+      },
     );
   }
 }

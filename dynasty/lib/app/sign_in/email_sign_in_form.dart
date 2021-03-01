@@ -1,13 +1,13 @@
 import 'dart:io';
-
 import 'package:dynasty/common_widgets/custom_text_form_field.dart';
 import 'package:dynasty/common_widgets/form_submit_button.dart';
 import 'package:dynasty/common_widgets/loading.dart';
 import 'package:dynasty/common_widgets/platform_alert_dialog.dart';
+import 'package:dynasty/common_widgets/select_pics.dart';
 import 'package:dynasty/services/auth.dart';
+import 'package:dynasty/services/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 
 enum EmailSignInFormType { signIn, register }
 
@@ -21,9 +21,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final ImagePicker _picker = ImagePicker();
-  PickedFile _imagePickedFile;
   File _imageFile;
+  SelectPics _imageHandler = SelectPics();
+  Validator _validator = Validator();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -51,6 +51,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       if (_formType == EmailSignInFormType.signIn) {
         await auth.signInWithEmailAndPassword(_email, _password);
       } else {
+        _imageFile = _imageHandler.imageFile;
         await auth.createUserWithEmailAndPassword(_firstName, _lastName, _email, _password, _imageFile);
       }
       Navigator.of(context).pop();
@@ -103,28 +104,6 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     ];
   }
 
-  String _nameValidator(value) {
-    if (value.isEmpty ||
-        !RegExp(r"^^[a-zA-Z]+").hasMatch(value)) {
-      return 'Enter a valid name';
-    }
-    return null;
-  }
-
-  String _emailValidator(value) {
-    if (value.isEmpty ||
-        !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
-      return 'Enter a valid email';
-    }
-    return null;
-  }
-  String _passwordValidator(value) {
-    if (value.isEmpty) {
-      return 'Password cannot be empty';
-    }
-    return null;
-  }
-
   String _confirmPasswordValidator(value) {
     if (value.isEmpty || value != _password) {
       return 'Passwords do not match';
@@ -134,95 +113,10 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   Widget _profilePicField() {
     if (_formType == EmailSignInFormType.register) {
-      return Center(
-        child: Stack(
-          children: <Widget>[
-            CircleAvatar(
-              radius: 45.0,
-                backgroundImage: _imagePickedFile == null ?
-                    AssetImage('assets/images/default_profilepic.png')
-                    : AssetImage(_imagePickedFile.path),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(75.0, 68.0, 0.0, 0.0),
-              child: InkWell(
-                child: Icon(
-                  Icons.camera_alt,
-                  color: Colors.green[700],
-                  size: 25.0,
-                ),
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: ((builder) => _bottomSheet())
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      );
+      return _imageHandler;
     } else {
       return Container();
     }
-  }
-
-  Widget _bottomSheet() {
-    return Container(
-      height: 100.0,
-      width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 20.0,
-      ),
-      child: Column(
-        children: <Widget>[
-          Text(
-            'Choose Profile Pic',
-            style: TextStyle(
-              fontSize: 20.0,
-            ),
-          ),
-          SizedBox(height: 20.0,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              FlatButton.icon(
-                icon: Icon(
-                  Icons.camera,
-                  color: Colors.green[800],
-                ),
-                onPressed: () {
-                  _takePic(ImageSource.camera);
-                },
-                label: Text('Camera'),
-              ),
-              FlatButton.icon(
-                icon: Icon(
-                  Icons.image,
-                  color: Colors.green[800],
-                ),
-                onPressed: () {
-                  _takePic(ImageSource.gallery);
-                },
-                label: Text('Gallery'),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  void _takePic(ImageSource source) async {
-    final pickedFile = await _picker.getImage(
-      source: source,
-    );
-    setState(() {
-      _imagePickedFile = pickedFile;
-      _imageFile = File(_imagePickedFile.path);
-      print("IMAGE:${_imagePickedFile.path}");
-    });
   }
 
   Widget _buildPasswordTextField() {
@@ -230,7 +124,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       controller: _passwordController,
       labelText: 'Password',
       obscureText: true,
-      validator: _passwordValidator,
+      validator: _validator.passwordValidator,
     );
   }
 
@@ -251,7 +145,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     return CustomTextFormField(
       controller: _emailController,
       labelText: 'Email',
-      validator: _emailValidator,
+      validator: _validator.emailValidator,
     );
   }
 
@@ -260,7 +154,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       return CustomTextFormField(
         controller: _firstNameController,
         labelText: 'First Name',
-        validator: _nameValidator,
+        validator: _validator.nameValidator,
       );
     } else {
       return Container();
@@ -272,7 +166,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       return CustomTextFormField(
         controller: _lastNameController,
         labelText: 'Last Name',
-        validator: _nameValidator,
+        validator: _validator.nameValidator,
       );
     } else {
       return Container();

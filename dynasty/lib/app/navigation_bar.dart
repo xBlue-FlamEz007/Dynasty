@@ -1,6 +1,8 @@
 import 'package:dynasty/app/home_page.dart';
 import 'package:dynasty/app/profile_page.dart';
+import 'package:dynasty/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class NavigationBar extends StatefulWidget {
   @override
@@ -26,19 +28,22 @@ class _NavigationBarState extends State<NavigationBar> {
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: _pageOptions[_index],
-      bottomNavigationBar: BottomNavigationBar(
-        items: _items,
-        fixedColor: Colors.white,
-        backgroundColor: Colors.green[500],
-        currentIndex: _index,
-        onTap: (int item) {
-          setState(() {
-            _index = item;
-          });
-        },
+    return Provider<DatabaseService>(
+      create: (context) => DatabaseService(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: _pageOptions[_index],
+        bottomNavigationBar: BottomNavigationBar(
+          items: _items,
+          fixedColor: Colors.white,
+          backgroundColor: Colors.green[500],
+          currentIndex: _index,
+          onTap: (int item) {
+            setState(() {
+              _index = item;
+            });
+          },
+        ),
       ),
     );
   }

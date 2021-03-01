@@ -1,7 +1,6 @@
 import 'package:dynasty/services/database.dart';
 import 'package:dynasty/modals/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:io';
@@ -9,6 +8,7 @@ import 'dart:io';
 abstract class AuthBase {
   Stream<USER> get onAuthStateChanged;
   Future<USER> currentUser();
+  String currentUserID();
   Future<USER> signInWithEmailAndPassword(String email, String password);
   Future<USER> createUserWithEmailAndPassword(String firstName, String lastName, String email, String password, File imageFile);
   Future<USER> signInWithGoogle();
@@ -37,6 +37,13 @@ class Auth implements AuthBase{
   }
 
   @override
+  String currentUserID() {
+    final user = _firebaseAuth.currentUser;
+    String uid = user.uid;
+    return uid;
+  }
+
+  @override
   Future<USER> signInWithEmailAndPassword(String email, String password) async {
     final authResult = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
     return _userFromFirebase(authResult.user);
@@ -46,7 +53,7 @@ class Auth implements AuthBase{
   Future<USER> createUserWithEmailAndPassword(String firstName, String lastName, String email, String password, File imageFile) async {
     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
     User user = authResult.user;
-    await DatabaseService(uid: user.uid).updateUserData(firstName, lastName, email, imageFile);
+    await DatabaseService(uid: user.uid).setUserData(firstName, lastName, email, imageFile);
     return _userFromFirebase(authResult.user);
   }
 
