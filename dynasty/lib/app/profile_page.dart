@@ -17,7 +17,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -38,9 +37,10 @@ class _ProfilePageState extends State<ProfilePage> {
       final auth = Provider.of<AuthBase>(context, listen: false);
       String uid = auth.currentUserID();
       _imageFile = _imageHandler.imageFile;
-      await DatabaseService(uid: uid).updateUserData(_firstName, _lastName, _imageFile);
+      await DatabaseService(uid: uid)
+          .updateUserData(_firstName, _lastName, _imageFile);
       Navigator.of(context).pop();
-    }  catch (e) {
+    } catch (e) {
       PlatformAlertDialog(
         title: 'Profile Update Failed',
         content: e.message,
@@ -89,11 +89,17 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Widget> _buildChildren() {
     return [
       _imageHandler,
-      SizedBox(height: 8.0,),
+      SizedBox(
+        height: 8.0,
+      ),
       _buildFirstNameTextField(),
-      SizedBox(height: 8.0,),
+      SizedBox(
+        height: 8.0,
+      ),
       _buildLastNameTextField(),
-      SizedBox(height: 16.0,),
+      SizedBox(
+        height: 16.0,
+      ),
       FormSubmitButton(
         text: 'Update',
         onPressed: _submit,
@@ -103,7 +109,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-
     final auth = Provider.of<AuthBase>(context, listen: false);
     String uid = auth.currentUserID();
 
@@ -118,9 +123,10 @@ class _ProfilePageState extends State<ProfilePage> {
           print(_imageName);
           //var _imageUrl = DatabaseService(uid: uid).getImageURL(_imageName);
           //print(_imageUrl);
+          _imageHandler = SelectPics(url: _imageName);
           //String _url = _imageUrl.toString();
           //print(_url);
-          _imageHandler.url = _imageName;
+          // _imageHandler.url = _imageName;
 
           return Scaffold(
             appBar: AppBar(
@@ -158,8 +164,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           );
-        }
-        else {
+        } else {
           return Loading();
         }
       },

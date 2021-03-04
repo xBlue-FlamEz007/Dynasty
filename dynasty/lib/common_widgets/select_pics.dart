@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SelectPics extends StatefulWidget {
+
   SelectPics({
     this.imageFile,
     this.url
@@ -29,8 +30,8 @@ class _SelectPicsState extends State<SelectPics> {
             radius: 45.0,
             backgroundImage: widget.url == null ?
             widget.imageFile == null ?
-            AssetImage('assets/images/default_profilepic.png') : AssetImage(widget.imageFile.path)
-            : Image(image: NetworkImage(widget.url)),
+            AssetImage('assets/images/default_profilepic.png') : FileImage(widget.imageFile)
+            : NetworkImage(widget.url),
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(75.0, 68.0, 0.0, 0.0),
@@ -107,7 +108,7 @@ class _SelectPicsState extends State<SelectPics> {
     setState(() {
       _imagePickedFile = pickedFile;
       widget.imageFile = File(_imagePickedFile.path);
-      print("IMAGE:${_imagePickedFile.path}");
+      print("IMAGE Path:${_imagePickedFile.path}");
     });
   }
 
