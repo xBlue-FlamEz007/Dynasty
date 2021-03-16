@@ -27,10 +27,10 @@ class _SelectPicsState extends State<SelectPics> {
         children: <Widget>[
           CircleAvatar(
             radius: 45.0,
-            backgroundImage: widget.url == null ?
-            widget.imageFile == null ?
-            AssetImage('assets/images/default_profilepic.png') : AssetImage(widget.imageFile.path)
-            : Image(image: NetworkImage(widget.url)),
+            backgroundImage: widget.imageFile == null ?
+            widget.url == null ?
+            AssetImage('assets/images/default_profilepic.png') : NetworkImage(widget.url)
+            : AssetImage(widget.imageFile.path),
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(75.0, 68.0, 0.0, 0.0),
@@ -107,7 +107,6 @@ class _SelectPicsState extends State<SelectPics> {
     setState(() {
       _imagePickedFile = pickedFile;
       widget.imageFile = File(_imagePickedFile.path);
-      print("IMAGE:${_imagePickedFile.path}");
     });
   }
 

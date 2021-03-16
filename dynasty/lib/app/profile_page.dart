@@ -115,11 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _firstNameController.text = userData.firstName;
           _lastNameController.text = userData.lastName;
           String _imageName = userData.profilePic;
-          print(_imageName);
-          //var _imageUrl = DatabaseService(uid: uid).getImageURL(_imageName);
-          //print(_imageUrl);
-          //String _url = _imageUrl.toString();
-          //print(_url);
           _imageHandler.url = _imageName;
 
           return Scaffold(

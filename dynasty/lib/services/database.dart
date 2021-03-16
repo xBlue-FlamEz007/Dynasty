@@ -36,19 +36,28 @@ class DatabaseService {
 
   Future updateUserData(String firstName, String lastName, File image) async {
     String imageFileName;
-    imageFileName = basename(image.path);
-    final firebaseStorage = FirebaseStorage.instance.ref().child(imageFileName);
-    final uploadTask = firebaseStorage.putFile(image);
-    var imageUrl = await (await uploadTask).ref.getDownloadURL();
-    String url = imageUrl.toString();
     var userReference = firestore.collection("users").doc(uid);
-    firestore.runTransaction((transaction) async {
-      transaction.update(userReference, {
-        'first name': firstName,
-        'last name': lastName,
-        'profile pic' : imageFileName,
+    if (image == null) {
+      firestore.runTransaction((transaction) async {
+        transaction.update(userReference, {
+          'first name': firstName,
+          'last name': lastName,
+        });
       });
-    });
+    } else {
+      imageFileName = basename(image.path);
+      final firebaseStorage = FirebaseStorage.instance.ref().child(imageFileName);
+      final uploadTask = firebaseStorage.putFile(image);
+      var imageUrl = await (await uploadTask).ref.getDownloadURL();
+      imageFileName = imageUrl.toString();
+      firestore.runTransaction((transaction) async {
+        transaction.update(userReference, {
+          'first name': firstName,
+          'last name': lastName,
+          'profile pic' : imageFileName,
+        });
+      });
+    }
   }
 
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -64,12 +73,6 @@ class DatabaseService {
   Stream <UserData> get userData {
     return userCollection.doc(uid).snapshots()
         .map(_userDataFromSnapshot);
-  }
-
-  Future getImageURL(String imageName) async {
-    final ref = FirebaseStorage.instance.ref().child(imageName);
-    var imageUrl = await ref.getDownloadURL();
-    return imageUrl;
   }
 
 }
