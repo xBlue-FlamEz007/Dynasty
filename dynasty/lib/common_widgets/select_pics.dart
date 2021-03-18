@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SelectPics extends StatefulWidget {
-  SelectPics({
-    this.imageFile,
-    this.url
-  });
-
+  SelectPics({this.imageFile, this.url = "https://workhound.com/wp-content/uploads/2017/05/placeholder-profile-pic.png"});
   File imageFile;
   String url;
 
@@ -16,21 +12,16 @@ class SelectPics extends StatefulWidget {
 }
 
 class _SelectPicsState extends State<SelectPics> {
-
   final ImagePicker _picker = ImagePicker();
   PickedFile _imagePickedFile;
-
+  bool _fileImage = false; 
   Widget profilePicField() {
-
     return Center(
       child: Stack(
         children: <Widget>[
           CircleAvatar(
             radius: 45.0,
-            backgroundImage: widget.imageFile == null ?
-            widget.url == null ?
-            AssetImage('assets/images/default_profilepic.png') : NetworkImage(widget.url)
-            : AssetImage(widget.imageFile.path),
+            backgroundImage: _fileImage == false ? NetworkImage(widget.url) : FileImage(widget.imageFile)
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(75.0, 68.0, 0.0, 0.0),
@@ -42,9 +33,7 @@ class _SelectPicsState extends State<SelectPics> {
               ),
               onTap: () {
                 showModalBottomSheet(
-                    context: context,
-                    builder: ((builder) => _bottomSheet())
-                );
+                    context: context, builder: ((builder) => _bottomSheet()));
               },
             ),
           ),
@@ -69,7 +58,9 @@ class _SelectPicsState extends State<SelectPics> {
               fontSize: 20.0,
             ),
           ),
-          SizedBox(height: 20.0,),
+          SizedBox(
+            height: 20.0,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -105,16 +96,14 @@ class _SelectPicsState extends State<SelectPics> {
       source: source,
     );
     setState(() {
+      _fileImage = true ; 
       _imagePickedFile = pickedFile;
       widget.imageFile = File(_imagePickedFile.path);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
     return profilePicField();
   }
 }
-
-

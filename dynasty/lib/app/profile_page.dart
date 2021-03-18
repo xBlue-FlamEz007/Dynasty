@@ -11,10 +11,12 @@ import 'package:dynasty/services/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
+
 
 class _ProfilePageState extends State<ProfilePage> {
 
