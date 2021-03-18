@@ -10,7 +10,9 @@ class DatabaseService {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final CollectionReference userCollection = FirebaseFirestore.instance.collection("users");
+  final CollectionReference propertyCollection = FirebaseFirestore.instance.collection("properties");
 
+  //USERS
   Future setUserData(String firstName, String lastName, String email, File image) async {
     String imageFileName;
     if (image == null) {
@@ -75,4 +77,28 @@ class DatabaseService {
         .map(_userDataFromSnapshot);
   }
 
+  //Properties
+  Future setPropertyData(File image, String propertyType, String description, String address,
+      String dealType, String price) async {
+    String imageFileName;
+    if (image == null) {
+      imageFileName = 'default';
+    } else {
+      imageFileName = basename(image.path);
+      final firebaseStorage = FirebaseStorage.instance.ref().child(imageFileName);
+      final uploadTask = firebaseStorage.putFile(image);
+      var imageUrl = await (await uploadTask).ref.getDownloadURL();
+      imageFileName = imageUrl.toString();
+      print(imageFileName);
+    }
+    await propertyCollection.add({
+      'property pic' : imageFileName,
+      'property type': propertyType,
+      'description': description,
+      'address': address,
+      'deal type' : dealType,
+      'price' : price,
+      'user id' : uid
+      });
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:dynasty/app/add_property.dart';
 import 'package:dynasty/app/home_page.dart';
 import 'package:dynasty/app/profile_page.dart';
 import 'package:dynasty/services/database.dart';
@@ -11,9 +12,10 @@ class NavigationBar extends StatefulWidget {
 
 class _NavigationBarState extends State<NavigationBar> {
   List<BottomNavigationBarItem> _items;
-  int _index = 0;
+  int _index = 1;
   final _pageOptions = [
     HomePage(),
+    AddPost(),
     ProfilePage(),
   ];
   
@@ -22,6 +24,8 @@ class _NavigationBarState extends State<NavigationBar> {
     _items = List();
     _items.add(BottomNavigationBarItem(
         icon: Icon(Icons.home), label: 'Home',));
+    _items.add(BottomNavigationBarItem(
+      icon: Icon(Icons.add_box_outlined), label: 'Add',));
     _items.add(BottomNavigationBarItem(
       icon: Icon(Icons.person), label: 'Profile',));
   }

@@ -37,6 +37,8 @@ dependencies:
   cloud_firestore: ^0.16.0
   image_picker: ^0.6.7+22
   firebase_storage: ^7.0.0
+  geolocator: ^5.1.5
+  geocoder: ^0.2.1
 
 
 dev_dependencies:
@@ -62,6 +64,7 @@ flutter:
     - assets/images/google.png
     - assets/images/applogo.png
     - assets/images/default_profilepic.png
+    - assets/images/property_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
