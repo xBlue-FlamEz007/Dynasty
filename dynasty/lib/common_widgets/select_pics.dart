@@ -28,7 +28,7 @@ class _SelectPicsState extends State<SelectPics> {
           CircleAvatar(
             radius: 45.0,
             backgroundImage: widget.imageFile == null ?
-            widget.url == null ?
+            widget.url == 'default' || widget.url == null ?
             AssetImage('assets/images/default_profilepic.png') : NetworkImage(widget.url)
             : AssetImage(widget.imageFile.path),
           ),

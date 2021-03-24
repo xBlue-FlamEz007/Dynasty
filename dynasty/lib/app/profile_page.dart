@@ -24,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String get _firstName => _firstNameController.text;
   String get _lastName => _lastNameController.text;
   File _imageFile;
+  bool _isLoading = false;
   SelectPics _imageHandler = SelectPics();
   Validator _validator = Validator();
 
@@ -38,8 +39,15 @@ class _ProfilePageState extends State<ProfilePage> {
       final auth = Provider.of<AuthBase>(context, listen: false);
       String uid = auth.currentUserID();
       _imageFile = _imageHandler.imageFile;
+      setState(() => _isLoading = true);
       await DatabaseService(uid: uid).updateUserData(_firstName, _lastName, _imageFile);
-      Navigator.of(context).pop();
+      PlatformAlertDialog(
+        title: 'Profile Updated',
+        content: 'Your profile has been updated',
+        defaultActionText: 'OK',
+      ).show(context);
+      setState(() => _isLoading = false);
+      //Navigator.of(context).pop();
     }  catch (e) {
       PlatformAlertDialog(
         title: 'Profile Update Failed',
@@ -117,7 +125,7 @@ class _ProfilePageState extends State<ProfilePage> {
           String _imageName = userData.profilePic;
           _imageHandler.url = _imageName;
 
-          return Scaffold(
+          return  _isLoading ? Loading() :Scaffold(
             appBar: AppBar(
               title: Text('Profile'),
               centerTitle: true,

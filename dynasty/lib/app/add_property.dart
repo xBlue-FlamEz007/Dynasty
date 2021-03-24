@@ -24,6 +24,7 @@ class _AddPostState extends State<AddPost> {
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   Validator _validator = Validator();
@@ -34,6 +35,7 @@ class _AddPostState extends State<AddPost> {
   bool _isLoading = false;
 
   String get _description => _descriptionController.text;
+  String get _location => _locationController.text;
   String get _address => _addressController.text;
   String get _price => _priceController.text;
   String get _radioValue => _radioButton.radioItem;
@@ -53,7 +55,7 @@ class _AddPostState extends State<AddPost> {
       final _dealType = _formType == AddPostFormType.sell ? 'Sell' : 'Rent';
       setState(() => _isLoading = true);
       await DatabaseService(uid: _userID).setPropertyData(_imageFile, _propertyType, _description,
-          _address, _dealType, _price);
+          _location, _address, _dealType, _price);
       PlatformAlertDialog(
         title: 'Property Uploaded',
         content: 'Your property has been uploaded',
@@ -174,12 +176,9 @@ class _AddPostState extends State<AddPost> {
     });
   }
 
-  void _getCurrentLocation() async {
+  void _getCurrentAddress() async {
     var position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
     var lastPosition = await Geolocator().getLastKnownPosition();
-    print(lastPosition);
-    print(position.latitude);
-    print(position.longitude);
     final coordinates = new Coordinates(position.latitude, position.longitude);
     final addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
     final first = addresses.first;
@@ -200,6 +199,14 @@ class _AddPostState extends State<AddPost> {
     );
   }
 
+  CustomTextFormField _buildLocationTextField() {
+    return CustomTextFormField(
+      controller: _locationController,
+      labelText: 'Location',
+      validator:  (val) =>_validator.checkEmpty(val, 'Location'),
+    );
+  }
+
   CustomTextFormField _buildAddressTextField() {
     return CustomTextFormField(
       controller: _addressController,
@@ -208,7 +215,7 @@ class _AddPostState extends State<AddPost> {
     );
   }
 
-  dynamic _buildLocation () {
+  dynamic _buildAddress () {
     return GestureDetector(
       child: Stack(
         children: <Widget>[
@@ -222,7 +229,7 @@ class _AddPostState extends State<AddPost> {
           Padding(
               padding: EdgeInsets.fromLTRB(115.0, 5.0, 0.0, 0.0),
               child: Text(
-                'Get Current Location',
+                'Get Current Address',
                 style: TextStyle(
                   fontSize: 15.0,
                   fontWeight: FontWeight.bold,
@@ -231,7 +238,7 @@ class _AddPostState extends State<AddPost> {
           ),
         ],
       ),
-      onTap: _getCurrentLocation,
+      onTap: _getCurrentAddress,
     );
   }
 
@@ -266,10 +273,12 @@ class _AddPostState extends State<AddPost> {
       _radioButton,
       _buildDescriptionTextField(),
       SizedBox(height: 10.0,),
+      _buildLocationTextField(),
+      SizedBox(height: 10.0,),
       _buildAddressTextField(),
-      SizedBox(height: 10,),
+      SizedBox(height: 10.0,),
       Center(child: Text('or')),
-      _buildLocation(),
+      _buildAddress(),
       SizedBox(height: 15.0,),
       Row(
         children: <Widget>[

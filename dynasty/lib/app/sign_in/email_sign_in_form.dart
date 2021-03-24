@@ -68,7 +68,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   void _toggleFormType() {
     setState(() {
       _formType = _formType == EmailSignInFormType.signIn ?
-          EmailSignInFormType.register : EmailSignInFormType.signIn;
+      EmailSignInFormType.register : EmailSignInFormType.signIn;
     });
     _emailController.clear();
     _passwordController.clear();
@@ -76,9 +76,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   List<Widget> _buildChildren() {
     final primaryText = _formType == EmailSignInFormType.signIn ?
-        'Sign in' : 'Register';
+    'Sign in' : 'Register';
     final secondaryText = _formType == EmailSignInFormType.signIn ?
-        'New User ? Register here' : 'Already a user? Sign in here';
+    'New User ? Register here' : 'Already a user? Sign in here';
     return [
       _profilePicField(),
       SizedBox(height: 8.0,),
@@ -190,6 +190,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     );
   }
 }
+
 
 
 
