@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 
 enum AddPostFormType { sell, rent }
@@ -53,20 +54,21 @@ class _AddPostState extends State<AddPost> {
       final _userID = auth.currentUserID();
       final _propertyType = _radioButton.radioItem;
       final _dealType = _formType == AddPostFormType.sell ? 'Sell' : 'Rent';
+      final _date = Jiffy().yMMMMd;
       setState(() => _isLoading = true);
       await DatabaseService(uid: _userID).setPropertyData(_imageFile, _propertyType, _description,
-          _location, _address, _dealType, _price);
+          _location, _address, _dealType, _price, _date);
       PlatformAlertDialog(
         title: 'Property Uploaded',
         content: 'Your property has been uploaded',
         defaultActionText: 'OK',
       ).show(context);
       setState(() => _isLoading = false);
-      //Navigator.of(context).pop();
+
     }  catch (e) {
       setState(() => _isLoading = false);
       PlatformAlertDialog(
-        title: 'Sign in failed',
+        title: 'Property Not Uploaded',
         content: e.message,
         defaultActionText: 'OK',
       ).show(context);
@@ -100,8 +102,8 @@ class _AddPostState extends State<AddPost> {
               ),
               onTap: () {
                 showModalBottomSheet(
-                    context: context,
-                    builder: ((builder) => _bottomSheet())
+                  context: context,
+                  builder: ((builder) => _bottomSheet())
                 );
               },
             ),

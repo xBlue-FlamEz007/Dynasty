@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dynasty/modals/property.dart';
 import 'package:dynasty/modals/user.dart';
@@ -12,9 +13,10 @@ class DatabaseService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final CollectionReference userCollection = FirebaseFirestore.instance.collection("users");
   final CollectionReference propertyCollection = FirebaseFirestore.instance.collection("properties");
+  CollectionReference favouriteCollection;
 
   //USERS
-  Future setUserData(String firstName, String lastName, String email, File image) async {
+  Future setUserData(String firstName, String lastName, String email, File image, String phoneNumber) async {
     String imageFileName;
     if (image == null) {
       imageFileName = 'default';
@@ -32,9 +34,11 @@ class DatabaseService {
         'first name': firstName,
         'last name': lastName,
         'email': email,
-        'profile pic' : imageFileName,
+        'profile pic': imageFileName,
+        'phone number': phoneNumber,
       });
     });
+    favouriteCollection = userCollection.doc(uid).collection("favourites");
   }
 
   Future updateUserData(String firstName, String lastName, File image) async {
@@ -63,13 +67,24 @@ class DatabaseService {
     }
   }
 
+  Future updateFavourites(List <String>favourites) async {
+    var userReference = firestore.collection("users").doc(uid);
+    firestore.runTransaction((transaction) async {
+      transaction.update(userReference, {
+        'favourites': favourites,
+      });
+    });
+  }
+
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
     return UserData(
       uid: uid,
       firstName: snapshot.data()['first name'],
       lastName: snapshot.data()['last name'],
       email: snapshot.data()['email'],
-      profilePic: snapshot.data()['profile pic']
+      profilePic: snapshot.data()['profile pic'],
+      phoneNumber: snapshot.data()['phone number'],
+      favourites: snapshot.data()['favourites'],
     );
   }
 
@@ -80,7 +95,7 @@ class DatabaseService {
 
   //Properties
   Future setPropertyData(File image, String propertyType, String description, String location,
-      String address, String dealType, String price) async {
+      String address, String dealType, String price, String date) async {
     String imageFileName;
     if (image == null) {
       imageFileName = 'default';
@@ -93,13 +108,14 @@ class DatabaseService {
       print(imageFileName);
     }
     await propertyCollection.add({
-      'property pic' : imageFileName,
+      'property pic': imageFileName,
       'property type': propertyType,
       'description': description,
       'location': location,
       'address': address,
-      'deal type' : dealType,
-      'price' : price,
+      'deal type': dealType,
+      'price': price,
+      'date': date,
       'user id' : uid
       });
   }
@@ -115,6 +131,7 @@ class DatabaseService {
           address: doc.data()['address'],
           dealType: doc.data()['deal type'],
           price: doc.data()['price'],
+          date: doc.data()['date'],
           uid: doc.data()['user id'],
         )).toList();
   }
@@ -137,8 +154,20 @@ class DatabaseService {
   }
 
   Stream <List<PropertyData>> get myProperties {
-    return propertyCollection.where('user id', isEqualTo: uid).where('deal type', isEqualTo: 'Rent').snapshots()
+    return propertyCollection.where('user id', isEqualTo: uid).snapshots()
         .map(_allPropertyListFromSnapshot);
+  }
+
+  Future<void> deleteImage(String pic) async {
+    var fileUrl = Uri.decodeFull(basename(pic)).replaceAll(new RegExp(r'(\?alt).*'), '');
+    print('PICTURE: $fileUrl');
+    final firebaseStorageRef =
+    FirebaseStorage.instance.ref().child(pic);
+    await firebaseStorageRef.delete();
+  }
+
+  Future<void> deletePost(String pid, String pic) {
+    return propertyCollection.doc(pid).delete();
   }
 
 }

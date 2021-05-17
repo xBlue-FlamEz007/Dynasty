@@ -1,10 +1,12 @@
+import 'package:dynasty/app/my_properties.dart';
+import 'package:dynasty/app/property_page.dart';
 import 'package:dynasty/common_widgets/loading.dart';
 import 'package:dynasty/common_widgets/no_property_text.dart';
-import 'package:dynasty/common_widgets/platform_alert_dialog.dart';
 import 'package:dynasty/modals/property.dart';
 import 'package:dynasty/modals/user.dart';
 import 'package:dynasty/services/auth.dart';
 import 'package:dynasty/services/database.dart';
+import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,22 +21,6 @@ class _HomePageState extends State<HomePage> {
 
   final ScrollController _scrollController = ScrollController();
   PropertyDealType _propertyDealType = PropertyDealType.both;
-  List <PropertyData> temp = [
-    PropertyData(pid: '1', propertyPic: 'assets/images/property_icon.png', propertyType: 'Office',
-    description: 'Nice', address: 'Scranton', dealType: 'sell', price: '10000', uid: '1814011'),
-    PropertyData(pid: '2', propertyPic: 'assets/images/property_icon.png', propertyType: 'Apartment',
-        description: 'asfsafsd', address: 'Kharghar', dealType: 'rent', price: '2340', uid: '1814033'),
-    PropertyData(pid: '3', propertyPic: 'assets/images/property_icon.png', propertyType: 'Apartment',
-        description: 'Nice', address: 'Scranton', dealType: 'sell', price: '10000', uid: '1814015'),
-    PropertyData(pid: '4', propertyPic: 'assets/images/property_icon.png', propertyType: 'Warehouse',
-        description: 'asasaswewe', address: 'Scranton', dealType: 'rent', price: '100', uid: '1814012'),
-    PropertyData(pid: '4', propertyPic: 'assets/images/property_icon.png', propertyType: 'Warehouse',
-        description: 'asasaswewe', address: 'Scranton', dealType: 'rent', price: '100', uid: '1814012'),
-    PropertyData(pid: '4', propertyPic: 'assets/images/property_icon.png', propertyType: 'Warehouse',
-        description: 'asasaswewe', address: 'Scranton', dealType: 'rent', price: '100', uid: '1814012'),
-    PropertyData(pid: '4', propertyPic: 'assets/images/property_icon.png', propertyType: 'Warehouse',
-        description: 'asasaswewe', address: 'Scranton', dealType: 'rent', price: '100', uid: '1814012')
-  ];
 
   GestureDetector _propertyTypeDetector(String typeName, FontWeight weight, double size,
       PropertyDealType dealType) {
@@ -68,6 +54,15 @@ class _HomePageState extends State<HomePage> {
           String firstName = userData.firstName;
           var profilePic = userData.profilePic ==  'default' ?
           AssetImage('assets/images/default_profilepic.png') : NetworkImage(userData.profilePic);
+          List <String>favourites = userData.favourites;
+          void addFavourite(String pid) {
+            favourites.add(pid);
+            DatabaseService(uid: uid).updateFavourites(favourites);
+          }
+          void removeFavourite(String pid) {
+            favourites.remove(pid);
+            DatabaseService(uid: uid).updateFavourites(favourites);
+          }
           var bothWeight, sellWeight, rentWeight, bothSize, sellSize, rentSize;
           Stream propertyStream;
           if (_propertyDealType == PropertyDealType.both) {
@@ -128,6 +123,22 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(350.0, 13.0, 0.0, 0.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.account_balance_sharp,
+                            color: Colors.green[900],
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (context) => MyProperties()
+                              )
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   Container(
@@ -167,12 +178,31 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.white,
                                       child: Stack(
                                         children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                                            height: 100.0,
-                                            child: propertyList[index].propertyPic == 'default' ?
-                                            Image.asset('assets/images/property_icon.png') :
-                                            Image.network(propertyList[index].propertyPic)
+                                          GestureDetector(
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+                                              height: 100.0,
+                                              child: propertyList[index].propertyPic == 'default' ?
+                                              Image.asset('assets/images/property_icon.png') :
+                                              Image.network(propertyList[index].propertyPic)
+                                            ),
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute<void>(
+                                                  builder: (context) => PropertyPage(
+                                                    propertyPic: propertyList[index].propertyPic,
+                                                    propertyType: propertyList[index].propertyType,
+                                                    description: propertyList[index].description,
+                                                    location: propertyList[index].location,
+                                                    address: propertyList[index].address,
+                                                    dealType: propertyList[index].dealType,
+                                                    price: propertyList[index].price,
+                                                    date: propertyList[index].date,
+                                                    uid: propertyList[index].uid,
+                                                  ),
+                                                )
+                                              );
+                                            },
                                           ),
                                           Container(
                                             padding: EdgeInsets.fromLTRB(100.0, 10.0, 10.0, 10.0),
@@ -183,16 +213,31 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          Container(
-                                            padding: EdgeInsets.fromLTRB(330.0, 0.0, 10.0, 10.0),
+                                         Container(
+                                           padding: EdgeInsets.fromLTRB(350.0, 10.0, 0.0, 0.0),
+                                           child: FavoriteButton(
+                                             iconSize: 30.0,
+                                             valueChanged: (_isFavorite) {
+                                               print('Is Favorite $_isFavorite)');
+                                             },
+                                           )
+                                         ),
+                                         /* Container(
+                                            padding: EdgeInsets.fromLTRB(340.0, 0.0, 10.0, 10.0),
                                             child: IconButton(
                                               iconSize: 20.0,
                                               icon: Icon(
                                                 Icons.favorite_border,
                                               ),
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                /*if (favourites.contains(propertyList[index].pid)) {
+                                                  removeFavourite(propertyList[index].pid);
+                                                } else {
+                                                  addFavourite(propertyList[index].pid);
+                                                }*/
+                                              },
                                             ),
-                                          ),
+                                          ),*/
                                           Container(
                                             padding: EdgeInsets.fromLTRB(100.0, 30.0, 10.0, 10.0),
                                             child: Row(
@@ -208,15 +253,21 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           Container(
-                                              padding: EdgeInsets.fromLTRB(105.0, 70.0, 10.0, 10.0),
-                                              child: Text(
-                                                propertyList[index].dealType
-                                              )
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.fromLTRB(315.0, 70.0, 10.0, 10.0),
-                                            child: Text(
-                                              '\$' + propertyList[index].price
+                                            padding: EdgeInsets.fromLTRB(105.0, 70.0, 10.0, 10.0),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Container(
+                                                  child: Text(
+                                                      propertyList[index].dealType
+                                                  )
+                                                ),
+                                                Container(
+                                                  child: Text(
+                                                    '\$' + propertyList[index].price
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ]

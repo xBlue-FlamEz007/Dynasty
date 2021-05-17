@@ -17,7 +17,6 @@ class _NavigationBarState extends State<NavigationBar> {
   final _pageOptions = [
     HomePage(),
     AddPost(),
-    MyProperties(),
     ProfilePage(),
   ];
   
@@ -28,10 +27,10 @@ class _NavigationBarState extends State<NavigationBar> {
         icon: Icon(Icons.home), label: 'Home',));
     _items.add(BottomNavigationBarItem(
       icon: Icon(Icons.add_box_outlined), label: 'Add',));
-    _items.add(BottomNavigationBarItem(
-      icon: Icon(Icons.add_box_outlined), label: 'Add',));
-   // _items.add(BottomNavigationBarItem(
-     // icon: Icon(Icons.person), label: 'Profile',));
+    //_items.add(BottomNavigationBarItem(
+      //icon: Icon(Icons.add_box_outlined), label: 'Add',));
+   _items.add(BottomNavigationBarItem(
+     icon: Icon(Icons.person), label: 'Profile',));
   }
   
   @override

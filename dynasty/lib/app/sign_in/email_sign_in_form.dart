@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dynasty/common_widgets/custom_text_form_field.dart';
 import 'package:dynasty/common_widgets/form_submit_button.dart';
 import 'package:dynasty/common_widgets/loading.dart';
@@ -6,6 +7,7 @@ import 'package:dynasty/common_widgets/platform_alert_dialog.dart';
 import 'package:dynasty/common_widgets/select_pics.dart';
 import 'package:dynasty/services/auth.dart';
 import 'package:dynasty/services/validation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,15 +30,19 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   String get _firstName => _firstNameController.text;
   String get _lastName => _lastNameController.text;
   String get _email => _emailController.text;
+  String get _phoneNumber => _phoneNumberController.text;
   String get _password => _passwordController.text;
   String get _confirmPassword => _confirmPasswordController.text;
   EmailSignInFormType _formType = EmailSignInFormType.signIn;
+  String _countryCode = '+91';
+  String _completePhoneNumber;
 
   void _submit() async {
     final isValid = _formKey.currentState.validate();
@@ -52,7 +58,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         await auth.signInWithEmailAndPassword(_email, _password);
       } else {
         _imageFile = _imageHandler.imageFile;
-        await auth.createUserWithEmailAndPassword(_firstName, _lastName, _email, _password, _imageFile);
+        _completePhoneNumber = _countryCode + " " + _phoneNumber;
+        await auth.createUserWithEmailAndPassword(_firstName, _lastName, _email, _password, _imageFile, _completePhoneNumber);
       }
       Navigator.of(context).pop();
     }  catch (e) {
@@ -88,6 +95,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       SizedBox(height: 8.0,),
       _buildEmailTextField(),
       SizedBox(height: 8.0,),
+      _buildPhoneNumberTextField(),
       _buildPasswordTextField(),
       SizedBox(height: 8.0,),
       _buildConfirmPasswordTextField(),
@@ -167,6 +175,51 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         controller: _lastNameController,
         labelText: 'Last Name',
         validator: _validator.nameValidator,
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  Widget _buildPhoneNumberTextField() {
+    if (_formType == EmailSignInFormType.register) {
+      return Container(
+        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+              child: Text(
+                'Phone Number',
+                style: TextStyle(
+                  fontSize: 15.0,
+                  color: Colors.grey[700]
+                ),
+              )
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+              child: CountryCodePicker(
+                initialSelection: '+91',
+                onChanged: (value) {
+                  _countryCode = value.toString();
+                  print(_countryCode);
+                },
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(100.0, 0.0, 0.0, 0.0),
+              child: TextFormField(
+                controller: _phoneNumberController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: '',
+                ),
+                validator: _validator.numberValidator,
+              ),
+            ),
+          ],
+        ),
       );
     } else {
       return Container();

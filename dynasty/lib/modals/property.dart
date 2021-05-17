@@ -1,7 +1,6 @@
 class PropertyData {
   PropertyData({this.pid, this.propertyPic, this.propertyType, this.description, this.location,
-    this.address,
-    this.dealType, this.price, this.uid});
+    this.address, this.dealType, this.price, this.date, this.uid});
   final String pid;
   final String propertyPic;
   final String propertyType;
@@ -10,5 +9,6 @@ class PropertyData {
   final String address;
   final String dealType;
   final String price;
+  final String date;
   final String uid;
 }

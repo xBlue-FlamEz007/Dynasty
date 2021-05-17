@@ -10,7 +10,7 @@ abstract class AuthBase {
   Future<USER> currentUser();
   String currentUserID();
   Future<USER> signInWithEmailAndPassword(String email, String password);
-  Future<USER> createUserWithEmailAndPassword(String firstName, String lastName, String email, String password, File imageFile);
+  Future<USER> createUserWithEmailAndPassword(String firstName, String lastName, String email, String password, File imageFile, String phoneNumber);
   Future<USER> signInWithGoogle();
   Future<void> signOut();
 }
@@ -50,10 +50,10 @@ class Auth implements AuthBase{
   }
 
   @override
-  Future<USER> createUserWithEmailAndPassword(String firstName, String lastName, String email, String password, File imageFile) async {
+  Future<USER> createUserWithEmailAndPassword(String firstName, String lastName, String email, String password, File imageFile, String phoneNumber) async {
     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
     User user = authResult.user;
-    await DatabaseService(uid: user.uid).setUserData(firstName, lastName, email, imageFile);
+    await DatabaseService(uid: user.uid).setUserData(firstName, lastName, email, imageFile, phoneNumber);
     return _userFromFirebase(authResult.user);
   }
 
